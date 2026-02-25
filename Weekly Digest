@@ -1,0 +1,32 @@
+name: Weekly Digest
+
+on:
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install slack-sdk anthropic notion-client python-dotenv
+      
+      - name: Generate and Send Weekly Digest
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        run: python scripts/send_weekly_digest.py
